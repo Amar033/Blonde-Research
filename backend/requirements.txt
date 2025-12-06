@@ -1,0 +1,25 @@
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+python-multipart==0.0.9
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-dotenv==1.0.0
+
+# Database (SQLite for now, easy to upgrade later)
+sqlalchemy==2.0.23
+alembic==1.13.1
+
+# Pydantic email validation (required for EmailStr)
+email-validator==2.1.0.post1
+
+# Web Search APIs
+tavily-python==0.3.3
+httpx==0.27.0
+
+# Utilities
+pydantic==2.5.0
+pydantic-settings==2.1.0

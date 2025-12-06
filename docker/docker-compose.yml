@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Unified app (vLLM + Backend + Frontend)
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.app
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - VLLM_API_URL=http://localhost:8000/v1
+      - VLLM_API_KEY=${VLLM_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - ENABLE_WEB_SEARCH=${ENABLE_WEB_SEARCH:-false}
+      - DATABASE_URL=postgresql+psycopg2://app:app@db:5432/appdb
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      - db
+    gpus: all
+    shm_size: '16gb'
+    restart: unless-stopped
+
+  # Postgres database
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=appdb
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  db_data:

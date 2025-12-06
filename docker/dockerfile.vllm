@@ -1,0 +1,33 @@
+# Start from NVIDIA's CUDA base (needed for GPU)
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
+
+# Install Python and system dependencies
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3-pip \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install vLLM (the inference engine)
+RUN pip3 install --no-cache-dir \
+    vllm==0.6.0 \
+    fastapi==0.115.0 \
+    uvicorn[standard]==0.30.0
+
+# Set working directory
+WORKDIR /app
+
+# Expose port 8000 (where the API runs)
+EXPOSE 8000
+
+# Health check (makes sure container is running)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command to start vLLM
+CMD ["python3", "-m", "vllm.entrypoints.openai.api_server", \
+     "--model", "shuyuej/Llama-3.3-70B-Instruct-GPTQ", \
+     "--quantization", "gptq", \
+     "--port", "8000", \
+     "--max-model-len", "8192"]
